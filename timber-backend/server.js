@@ -21,10 +21,10 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Register API Routes
-app.use("/inventory", inventoryRoutes);
-app.use("/suppliers", supplierRoutes);
-app.use("/tasks", taskRoutes);
-app.use("/estimate-cost", costEstimationRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/suppliers", supplierRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/estimate-cost", costEstimationRoutes);
 
 // Root Endpoint
 app.get("/", (req, res) => {
