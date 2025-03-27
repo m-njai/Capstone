@@ -1,0 +1,46 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  thead {
+    background: #f8f9fa;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  th {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  span.status-badge {
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+  
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  
+  button:nth-child(2) {
+    background: #28a745; /* Green for Email */
+  }
+  
+  button:nth-child(3) {
+    background: #ffc107; /* Yellow for Mark Paid */
+  }
+  

@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { getInventory, addInventory } from "../api/api";
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField } from "@mui/material";
+import axios from "axios";
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, MenuItem, Select } from "@mui/material";
 
 const Inventory = () => {
     const [inventory, setInventory] = useState([]);
-    const [newItem, setNewItem] = useState({ timber_type: "", stock: "", reorder_threshold: "" });
+    const [newItem, setNewItem] = useState({ category: "", name: "", quantity: 0, unit: "" });
+
+    const categories = [
+        "Foundation and Groundwork",
+        "Timber Framing and Structural Components",
+        "Roofing",
+        "Exterior Cladding",
+        "Windows and Doors",
+        "Interior Finishes",
+        "Utilities and Fixtures",
+        "Landscaping and Outdoor Features"
+    ];
+
+    const units = ["cubic meters", "kg", "pieces", "liters"];
 
     useEffect(() => {
         loadInventory();
@@ -12,7 +25,7 @@ const Inventory = () => {
 
     const loadInventory = async () => {
         try {
-            const response = await getInventory();
+            const response = await axios.get("http://localhost:8000/api/inventory");
             setInventory(response.data.inventory);
         } catch (error) {
             console.error("Error loading inventory:", error);
@@ -20,29 +33,35 @@ const Inventory = () => {
     };
 
     const handleAddInventory = async () => {
-        await addInventory(newItem);
-        loadInventory();
-        setNewItem({ timber_type: "", stock: "", reorder_threshold: "" });
+        try {
+            await axios.post("http://localhost:8000/api/inventory", newItem);
+            loadInventory();
+            setNewItem({ category: "", name: "", quantity: 0, unit: "" });
+        } catch (error) {
+            console.error("Error adding inventory:", error);
+        }
     };
 
     return (
         <Container>
-            <h2>Timber Inventory</h2>
+            <h2>Inventory</h2>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Timber Type</TableCell>
-                            <TableCell>Stock</TableCell>
-                            <TableCell>Reorder Threshold</TableCell>
+                            <TableCell>Category</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Quantity</TableCell>
+                            <TableCell>Unit</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {inventory.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.timber_type}</TableCell>
-                                <TableCell>{item.stock}</TableCell>
-                                <TableCell>{item.reorder_threshold}</TableCell>
+                            <TableRow key={item._id}>
+                                <TableCell>{item.category}</TableCell>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.quantity}</TableCell>
+                                <TableCell>{item.unit}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -50,11 +69,46 @@ const Inventory = () => {
             </TableContainer>
 
             <h3>Add New Inventory</h3>
-            <TextField label="Timber Type" value={newItem.timber_type} onChange={(e) => setNewItem({ ...newItem, timber_type: e.target.value })} />
-            <TextField label="Stock" type="number" value={newItem.stock} onChange={(e) => setNewItem({ ...newItem, stock: e.target.value })} />
-            <TextField label="Reorder Threshold" type="number" value={newItem.reorder_threshold} onChange={(e) => setNewItem({ ...newItem, reorder_threshold: e.target.value })} />
-            <Button variant="contained" color="primary" onClick={handleAddInventory}>Add Inventory</Button>
+            <Select
+                value={newItem.category}
+                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                displayEmpty
+                fullWidth
+            >
+                <MenuItem value="" disabled>Select Category</MenuItem>
+                {categories.map((category) => (
+                    <MenuItem key={category} value={category}>{category}</MenuItem>
+                ))}
+            </Select>
+            <TextField
+                label="Name"
+                value={newItem.name}
+                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                fullWidth
+            />
+            <TextField
+                label="Quantity"
+                type="number"
+                value={newItem.quantity}
+                onChange={(e) => setNewItem({ ...newItem, quantity: +e.target.value })}
+                fullWidth
+            />
+            <Select
+                value={newItem.unit}
+                onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
+                displayEmpty
+                fullWidth
+            >
+                <MenuItem value="" disabled>Select Unit</MenuItem>
+                {units.map((unit) => (
+                    <MenuItem key={unit} value={unit}>{unit}</MenuItem>
+                ))}
+            </Select>
+            <Button variant="contained" color="primary" onClick={handleAddInventory}>
+                Add Item
+            </Button>
         </Container>
     );
 };
+
 export default Inventory;

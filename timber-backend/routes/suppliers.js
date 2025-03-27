@@ -1,42 +1,71 @@
-const express = require("express");
+// routes/suppliers.js
+const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
+const Supplier = require('../models/Supplier'); // Import Supplier model
 
-let suppliers = [
-    { id: 1, name: "Timber NZ Ltd", location: "Auckland", contact: "info@timbernz.co.nz" },
-    { id: 2, name: "EcoWood Suppliers", location: "Wellington", contact: "sales@ecowood.com" }
-];
-
-let orders = [];
-
-// Get all suppliers
-router.get("/", (req, res) => {
-    res.json({ suppliers });
+// Fetch all suppliers
+router.get('/suppliers', async (req, res) => {
+  try {
+    const suppliers = await Supplier.find();
+    res.json(suppliers);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching suppliers' });
+  }
 });
 
-// Place an order
-router.post("/order", (req, res) => {
-    const { supplier_id, timber_type, quantity } = req.body;
-    let supplier = suppliers.find(s => s.id === supplier_id);
-    if (!supplier) return res.status(404).json({ error: "Supplier not found" });
+// Add a new supplier
+router.post('/suppliers', async (req, res) => {
+  const supplierData = req.body;
 
-    let newOrder = {
-        order_id: uuidv4(),
-        supplier_id,
-        supplier_name: supplier.name,
-        timber_type,
-        quantity,
-        status: "Pending",
-        timestamp: new Date().toISOString()
-    };
-
-    orders.push(newOrder);
-    res.json({ message: "Order placed successfully", order: newOrder });
+  try {
+    const newSupplier = new Supplier(supplierData);
+    await newSupplier.save();
+    res.json({ message: 'Supplier added successfully', supplier: newSupplier });
+  } catch (error) {
+    res.status(500).json({ error: 'Error adding supplier' });
+  }
 });
 
-// Get all orders
-router.get("/orders", (req, res) => {
-    res.json({ orders });
+// Update an existing supplier
+router.put('/suppliers/:id', async (req, res) => {
+  const supplierId = req.params.id;
+  const updatedData = req.body;
+
+  try {
+    const updatedSupplier = await Supplier.findByIdAndUpdate(supplierId, updatedData, { new: true });
+    if (!updatedSupplier) {
+      return res.status(404).json({ error: 'Supplier not found' });
+    }
+    res.json({ message: 'Supplier updated successfully', supplier: updatedSupplier });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating supplier' });
+  }
 });
 
+// Delete a supplier
+router.delete('/suppliers/:id', async (req, res) => {
+  const supplierId = req.params.id;
+
+  try {
+    const deletedSupplier = await Supplier.findByIdAndDelete(supplierId);
+    if (!deletedSupplier) {
+      return res.status(404).json({ error: 'Supplier not found' });
+    }
+    res.json({ message: 'Supplier deleted successfully', supplier: deletedSupplier });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting supplier' });
+  }
+});
+
+router.put("/orders/:id/status", (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+  
+    const order = orders.find(o => o.order_id === id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+  
+    order.status = status;
+    res.json({ message: "Order status updated", order });
+  });
+  
 module.exports = router;
