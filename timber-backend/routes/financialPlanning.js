@@ -2,7 +2,7 @@ const express = require("express");
 const { Parser } = require("json2csv");
 const jsPDF = require("jspdf");
 const autoTable = require("jspdf-autotable");
-const authenticateToken = require("../middleware/authMiddleware");
+const authenticateToken = require("../middleware/authFirebase");
 
 const router = express.Router();
 

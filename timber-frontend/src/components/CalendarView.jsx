@@ -4,8 +4,9 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import axios from "axios";
 
-const locales = {
-  "en-NZ": require("date-fns/locale/en-NZ")
+import enNZ from "date-fns/locale/en-NZ";
+
+const locales = { "en-NZ": enNZ
 };
 
 const localizer = dateFnsLocalizer({

@@ -1,7 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { AuthProvider } from './components/contexts/AuthContext'; // For authentication
-import ProtectedRoute from './components/ProtectedRoute'; // Role-based access control
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './components/contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Document Management
 import DocumentList from './components/DocumentList';
@@ -11,12 +11,13 @@ import ExportComponent from './components/ExportComponent';
 import GanttChart from './components/GanttChart';
 
 // Pages
-import LoginPage from './pages/LandingPage';
-import Login from './pages/Login';
+import LandingPage from './pages/LandingPage'; // Corrected name
+import Login from './pages/Login';             // Corrected usage
 import Register from './pages/Register';
 import FinancialPlan from './pages/FinancialPlan';
+import Dashboard from './pages/Dashboard';     // Main dashboard wrapper
 
-// Dashboards (from Dashboard folder)
+// Dashboards
 import ComplianceDashboard from './pages/Dashboard/ComplianceDashboard';
 import FinancialDashboard from './pages/Dashboard/FinancialDashboard';
 import InventoryDashboard from './pages/Dashboard/InventoryDashboard';
@@ -28,145 +29,136 @@ import SustainabilityDashboard from './pages/Dashboard/SustainabilityDashboard';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        {/* Navigation Bar */}
-        <nav>
-          <Link to="/documents">Documents</Link>{" "}
-          <Link to="/upload">Upload Document</Link>{" "}
-          <Link to="/login">Login</Link>{" "}
-          <Link to="/dashboard">Dashboard</Link>{" "}
-          <Link to="/financial-plan">Financial Plan</Link>{" "}
-          <Link to="/gantt-chart">Gantt Chart</Link>{" "}
-        </nav>
-
-        {/* Route Definitions */}
+    <BrowserRouter>
+      <AuthProvider>
         <Routes>
+          {/* Public Pages */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+
           {/* Document Management */}
-          <Route 
-            path="/documents" 
+          <Route
+            path="/documents"
             element={
               <ProtectedRoute roles={['Admin', 'Builder', 'Supplier', 'Compliance Officer']}>
                 <DocumentList />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/upload" 
+          <Route
+            path="/upload"
             element={
               <ProtectedRoute roles={['Admin', 'Builder', 'Supplier']}>
                 <DocumentUpload />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/review/:docId" 
+          <Route
+            path="/review/:docId"
             element={
               <ProtectedRoute roles={['Admin', 'Compliance Officer']}>
                 <DocumentReview />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          {/* Auth */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Main Dashboard + Tools */}
-          <Route 
-            path="/dashboard" 
+          {/* Dashboard + Tools */}
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
-                <div>
+                <>
                   <Dashboard />
                   <ExportComponent />
-                </div>
+                </>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/financial-plan" 
+          <Route
+            path="/financial-plan"
             element={
               <ProtectedRoute>
                 <FinancialPlan />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/gantt-chart" 
+          <Route
+            path="/gantt-chart"
             element={
               <ProtectedRoute>
                 <GanttChart />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          {/* Individual Dashboards */}
-          <Route 
-            path="/dashboard/compliance" 
+          {/* Sub-Dashboards */}
+          <Route
+            path="/dashboard/compliance"
             element={
               <ProtectedRoute roles={['Admin', 'Compliance Officer']}>
                 <ComplianceDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/financial" 
+          <Route
+            path="/dashboard/financial"
             element={
               <ProtectedRoute roles={['Admin', 'Finance Manager']}>
                 <FinancialDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/inventory" 
+          <Route
+            path="/dashboard/inventory"
             element={
               <ProtectedRoute roles={['Admin', 'Inventory Manager']}>
                 <InventoryDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/project" 
+          <Route
+            path="/dashboard/project"
             element={
               <ProtectedRoute roles={['Admin', 'Project Manager']}>
-                <ProjectDashboard />
-                <ProjectOverview />
+                <>
+                  <ProjectDashboard />
+                  <ProjectOverview />
+                </>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/settings" 
+          <Route
+            path="/dashboard/settings"
             element={
               <ProtectedRoute roles={['Admin']}>
                 <SettingsDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/supply-chain" 
+          <Route
+            path="/dashboard/supply-chain"
             element={
               <ProtectedRoute roles={['Admin', 'Supplier Manager']}>
                 <SupplyChainDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/dashboard/sustainability" 
+          <Route
+            path="/dashboard/sustainability"
             element={
               <ProtectedRoute roles={['Admin', 'Sustainability Officer']}>
                 <SustainabilityDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          {/* Catch-All Routes */}
+          {/* Catch-All */}
           <Route path="*" element={<p>Not Found</p>} />
-          <Route path="/" element={<Navigate to="/documents" />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

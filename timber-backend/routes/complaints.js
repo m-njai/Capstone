@@ -23,5 +23,3 @@ router.get("/", (req, res) => {
 });
 
 module.exports = router;
-Mount it:
-app.use("/api/complaints", require("./routes/complaints"));
