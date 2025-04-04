@@ -8,5 +8,6 @@ const TransactionSchema = new mongoose.Schema({
   note: String,
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project" } // Reference to Project
 });
+const Transaction = mongoose.model("Transaction", TransactionSchema);
 
-module.exports = mongoose.model("Transaction", TransactionSchema);
+module.exports = Transaction;

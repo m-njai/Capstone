@@ -27,15 +27,16 @@ const authRoutes = require("./routes/auth");
 const complianceRoutes = require("./routes/compliance");
 const supplierRoutes = require("./routes/suppliers");
 const tasksRoutes = require("./routes/tasks");
-const inventoryTransactionsRoutes = require("./routes/inventoryTransactions");
+const inventoryTransactionsRoutes = require("./routes/inventory");
 const financialPlanningRoutes = require("./routes/financialPlanning");
 const leadsRoutes = require("./routes/leads");
 const projectShowcaseRoutes = require("./routes/projectShowcase");
-const newsletterRoutes = require("./routes/newsletter");
+const newsletterRoutes = require("./routes/subscribers");
 const usersRoutes = require("./routes/users");
 const invoiceRoutes = require("./routes/invoices");
 const assistantRoutes = require("./routes/assistant");
 const rolesRoutes = require("./routes/roles");
+const financeRoutes = require("./routes/finance");
 
 // API Routes
 app.use("/api/auth", require("./routes/auth"));
@@ -46,13 +47,13 @@ app.use("/api/tasks", tasksRoutes);
 app.use("/api", inventoryTransactionsRoutes);
 app.use("/api/financial-planning", financialPlanningRoutes);
 app.use("/api/leads", leadsRoutes);
-app.use("/api/showcase", projectShowcaseRoutes);
+app.use("/api/projects", projectShowcaseRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/assistant", assistantRoutes);
 app.use("/api/roles", rolesRoutes); // This is your roles endpoint
-
+app.use("/api/finance", financeRoutes);
 // Root test route
 app.get("/", (req, res) => res.send("API running..."));
 app.post('/api/auth/login', (req, res) => {

@@ -1,10 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const { Parser } = require("json2csv");
+// controllers/subscriberController.js
 const Subscriber = require("../models/Subscriber");
+const { Parser } = require("json2csv");
 
-// Add new subscriber
-router.post("/", async (req, res) => {
+const addSubscriber = async (req, res) => {
   const { name, email } = req.body;
   if (!email) return res.status(400).json({ error: "Email is required" });
 
@@ -17,10 +15,9 @@ router.post("/", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
-});
+};
 
-// CSV Export
-router.get("/export", async (req, res) => {
+const exportSubscribersCSV = async (req, res) => {
   try {
     const subscribers = await Subscriber.find();
     const fields = ["name", "email", "subscribedAt"];
@@ -29,20 +26,23 @@ router.get("/export", async (req, res) => {
 
     res.header("Content-Type", "text/csv");
     res.attachment("subscribers.csv");
-    return res.send(csv);
+    res.send(csv);
   } catch (err) {
     res.status(500).json({ error: "Failed to export CSV" });
   }
-});
+};
 
-// Subscriber List Endpoint
-router.get("/list", async (req, res) => {
+const listSubscribers = async (req, res) => {
   try {
     const subscribers = await Subscriber.find().sort({ subscribedAt: -1 });
     res.json(subscribers);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch subscribers" });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  addSubscriber,
+  exportSubscribersCSV,
+  listSubscribers,
+};

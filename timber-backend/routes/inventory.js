@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
+const Transaction = require("../models/Transaction");
 
 const router = express.Router();
 
@@ -14,17 +15,6 @@ const ItemSchema = new mongoose.Schema({
 });
 
 const Item = mongoose.model("Item", ItemSchema);
-
-// ----------------------------
-// Transactions Schema & Model
-const TransactionSchema = new mongoose.Schema({
-  type: { type: String, enum: ["income", "expense"], required: true },
-  amount: { type: Number, required: true },
-  date: { type: Date, default: Date.now },
-  description: String
-});
-
-const Transaction = mongoose.model("Transaction", TransactionSchema);
 
 // ----------------------------
 // Routes for Inventory

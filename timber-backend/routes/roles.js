@@ -1,14 +1,19 @@
-const express = require('express');
+// routes/roles.js
+const express = require("express");
 const router = express.Router();
-const Role = require('../models/Role');
+const {
+  getAllRoles,
+  createRole,
+  deleteRole,
+} = require("../controllers/roleController");
 
-router.get('/', async (req, res) => {
-  try {
-    const roles = await Role.find();
-    res.json(roles);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch roles' });
-  }
-});
+// Get all roles
+router.get("/", getAllRoles);
+
+// Create new role (optional)
+router.post("/", createRole);
+
+// Delete role by ID (optional)
+router.delete("/:id", deleteRole);
 
 module.exports = router;

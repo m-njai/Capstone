@@ -6,7 +6,7 @@ import SupplyChainDashboard from './SupplyChain/SupplyChainDashboard';
 import SustainabilityDashboard from './Governance/SustainabilityDashboard';
 import InventoryDashboard from './Inventory/InventoryDashboard';
 import UserProfile from './UserProfile';
-import photo45 from '../photos/AI.jpg'; //  background
+import photo45 from '../photos/photo73.jpg'; //  background
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
