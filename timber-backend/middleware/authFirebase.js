@@ -1,22 +1,26 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("../firebaseServiceAccountKey.json"); // Replace with your service account
 
+// Initialize only once
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.applicationDefault(), // or use serviceAccount
   });
 }
 
 const verifyFirebaseToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split('Bearer ')[1];
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.user = decoded;
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.firebaseUser = decodedToken;
     next();
   } catch (err) {
-    console.error("Firebase token verification failed", err);
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Invalid Firebase token", error: err.message });
   }
 };
 

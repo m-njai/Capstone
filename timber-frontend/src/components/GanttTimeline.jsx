@@ -12,7 +12,7 @@ const GanttTimeline = ({ projectId }) => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tasks", {
+    axios.get("/api/tasks", {
       params: { projectId }
     }).then(res => {
       const transformed = res.data.map(task => ({

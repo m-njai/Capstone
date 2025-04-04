@@ -1,25 +1,33 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { getAuth } from "firebase/auth";
 import "react-toastify/dist/ReactToastify.css";
 
 const OrderManager = () => {
   const [orders, setOrders] = useState([]);
 
-  // Fetch all orders and identify delayed ones
+  // ✅ Fetch all orders with auth token
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/suppliers/orders");
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
+      const res = await axios.get("/api/suppliers/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       const data = res.data.orders || [];
       setOrders(data);
 
-      // Filter for delayed orders
+      // Identify delayed orders
       const delayed = data.filter((o) => {
         if (o.status === "Delivered" || !o.expected_delivery) return false;
         return new Date(o.expected_delivery) < new Date();
       });
 
-      // Show warning for delayed orders
       if (delayed.length > 0) {
         toast.warning(`${delayed.length} order(s) are delayed!`, {
           position: "top-right",
@@ -27,23 +35,35 @@ const OrderManager = () => {
         });
       }
     } catch (err) {
+      console.error("Order fetch error:", err);
       alert("Error fetching orders.");
     }
   };
 
-  // Update order status
+  // ✅ Update order status with auth token
   const updateStatus = async (order_id, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/suppliers/orders/${order_id}/status`, {
-        status: newStatus,
-      });
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
+      await axios.put(
+        `/api/suppliers/orders/${order_id}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       fetchOrders();
     } catch (err) {
+      console.error("Status update error:", err);
       alert("Error updating status.");
     }
   };
 
-  // Check if an order is delayed
+  // Utility: Check if order is delayed
   const isDelayed = (order) => {
     if (order.status === "Delivered" || !order.expected_delivery) return false;
     const today = new Date();
@@ -100,7 +120,6 @@ const OrderManager = () => {
           ))}
         </tbody>
       </table>
-      {/* Toast notifications */}
       <ToastContainer />
     </div>
   );

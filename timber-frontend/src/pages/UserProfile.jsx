@@ -10,31 +10,47 @@ const UserProfile = ({ userId }) => {
   const [passwords, setPasswords] = useState({ currentPassword: "", newPassword: "" });
 
   useEffect(() => {
-    // Fetch user data
-    axios.get(`/api/users/${userId}`).then(res => {
-      setForm({
-        name: res.data.name,
-        email: res.data.email,
-        phone: res.data.phone || "",
-        role: res.data.role || "N/A"
-      });
-      setPreview(res.data.avatar);
-    });
+    if (!userId) {
+      console.error("User ID is undefined");
+      return; // Exit if userId is not provided
+    }
+    // Fetch user data safely
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get(`/api/users/${userId}`);
+        setForm({
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone || "",
+          role: res.data.role || "N/A"
+        });
+        setPreview(res.data.avatar);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setStatus("error");
+      }
+    };
+    fetchUserData();
   }, [userId]);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAvatarChange = e => {
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    setAvatar(file);
-    setPreview(URL.createObjectURL(file));
+    if (file) {
+      setAvatar(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!userId) {
+        throw new Error("User ID is undefined");
+      }
       // Update user profile details
       await axios.put(`/api/users/${userId}`, form);
 
@@ -46,19 +62,24 @@ const UserProfile = ({ userId }) => {
       }
 
       setStatus("success");
-    } catch {
+    } catch (err) {
+      console.error("Error updating profile:", err);
       setStatus("error");
     }
   };
 
   const handlePasswordChange = async () => {
     try {
+      if (!userId) {
+        throw new Error("User ID is undefined");
+      }
       // Update the password
       await axios.put(`/api/users/${userId}/change-password`, passwords);
       alert("Password changed successfully");
       setPasswords({ currentPassword: "", newPassword: "" });
       setShowPasswordForm(false);
     } catch (err) {
+      console.error("Error updating password:", err);
       alert(err.response?.data?.error || "Error updating password");
     }
   };
@@ -113,14 +134,18 @@ const UserProfile = ({ userId }) => {
             placeholder="Current Password"
             name="currentPassword"
             value={passwords.currentPassword}
-            onChange={e => setPasswords({ ...passwords, currentPassword: e.target.value })}
+            onChange={(e) =>
+              setPasswords({ ...passwords, currentPassword: e.target.value })
+            }
           />
           <input
             type="password"
             placeholder="New Password"
             name="newPassword"
             value={passwords.newPassword}
-            onChange={e => setPasswords({ ...passwords, newPassword: e.target.value })}
+            onChange={(e) =>
+              setPasswords({ ...passwords, newPassword: e.target.value })
+            }
           />
           <button type="button" onClick={handlePasswordChange}>
             Save Password

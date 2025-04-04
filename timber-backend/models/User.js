@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String, // Optional with Firebase
-  roleId: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
-  provider: { type: String, default: "local" } // or "firebase"
-}, { timestamps: true });
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  roleId: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
+  provider: { type: String, default: "firebase" },
+});
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", userSchema);

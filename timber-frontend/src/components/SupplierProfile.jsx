@@ -6,11 +6,11 @@ const SupplierProfile = ({ supplierId }) => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/suppliers").then(res => {
+    axios.get("/api/suppliers").then(res => {
       const match = res.data.suppliers.find(s => s.id === supplierId);
       setSupplier(match);
     });
-    axios.get("http://localhost:5000/api/suppliers/orders").then(res => {
+    axios.get("/api/suppliers/orders").then(res => {
       const filtered = res.data.orders.filter(o => o.supplier_id === supplierId);
       setOrders(filtered);
     });

@@ -20,7 +20,7 @@ const SupplierManager = () => {
   // Fetch all suppliers
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/suppliers");
+      const res = await axios.get("/api/suppliers");
       setSuppliers(res.data.suppliers || res.data); // Support either structure
     } catch (err) {
       alert("Error fetching suppliers.");
@@ -47,10 +47,10 @@ const SupplierManager = () => {
 
     try {
       if (editMode && editId) {
-        await axios.put(`http://localhost:5000/api/suppliers/${editId}`, form);
+        await axios.put(`/api/suppliers/${editId}`, form);
         alert("Supplier updated successfully.");
       } else {
-        await axios.post("http://localhost:5000/api/suppliers", form);
+        await axios.post("/api/suppliers", form);
         alert("Supplier added successfully.");
       }
       setForm({
@@ -84,7 +84,7 @@ const SupplierManager = () => {
     if (!window.confirm("Are you sure you want to delete this supplier?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/suppliers/${id}`);
+      await axios.delete(`/api/suppliers/${id}`);
       fetchSuppliers();
       alert("Supplier deleted successfully.");
     } catch (err) {

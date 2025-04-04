@@ -9,7 +9,7 @@ const ComplaintLog = () => {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/complaints");
+        const response = await axios.get("/api/complaints");
         setComplaints(response.data.complaints || []);
       } catch (error) {
         console.error("Error fetching complaints:", error);

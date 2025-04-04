@@ -20,12 +20,12 @@ function FinancialPlan() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    await axios.post('http://localhost:5000/api/finance/save', form, { headers });
+    await axios.post('/api/finance/save', form, { headers });
     fetchPlans();
   };
 
   const fetchPlans = async () => {
-    const res = await axios.get('http://localhost:5000/api/finance/my-plans', { headers });
+    const res = await axios.get('/api/finance/my-plans', { headers });
     setPlans(res.data);
   };
 

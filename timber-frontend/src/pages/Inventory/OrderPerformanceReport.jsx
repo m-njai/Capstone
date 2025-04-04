@@ -22,14 +22,14 @@ const OrderPerformanceReport = () => {
 
   // Fetch suppliers on load
   useEffect(() => {
-    axios.get("http://localhost:5000/api/suppliers").then((res) => {
+    axios.get("/api/suppliers").then((res) => {
       setSuppliers(res.data.suppliers || []);
     });
   }, []);
 
   // Fetch orders with filters
   const fetchFilteredReport = async () => {
-    const res = await axios.get("http://localhost:5000/api/suppliers/orders");
+    const res = await axios.get("/api/suppliers/orders");
     const allOrders = res.data.orders || [];
 
     let filtered = allOrders;

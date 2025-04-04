@@ -6,7 +6,7 @@ const MaterialOrderForm = () => {
   const [order, setOrder] = useState({ supplier_id: "", timber_type: "", quantity: "" });
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/suppliers").then(res => {
+    axios.get("/api/suppliers").then(res => {
       setSuppliers(res.data.suppliers || []);
     });
   }, []);
@@ -15,7 +15,7 @@ const MaterialOrderForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await axios.post("http://localhost:5000/api/suppliers/order", order);
+    const res = await axios.post("/api/suppliers/order", order);
     alert(res.data.message);
     setOrder({ supplier_id: "", timber_type: "", quantity: "" });
   };

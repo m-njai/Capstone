@@ -5,7 +5,7 @@ const SustainabilityDashboard = ({ projectId }) => {
   const [score, setScore] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/sustainability/score/${projectId}`).then(res => {
+    axios.get(`/api/sustainability/score/${projectId}`).then(res => {
       setScore(res.data);
     });
   }, [projectId]);

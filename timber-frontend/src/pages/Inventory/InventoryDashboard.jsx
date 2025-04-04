@@ -5,7 +5,7 @@ const InventoryDashboard = () => {
   const [inventory, setInventory] = useState({});
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/suppliers/inventory").then(res => {
+    axios.get("/api/suppliers/inventory").then(res => {
       setInventory(res.data.inventory);
     });
   }, []);

@@ -38,6 +38,7 @@ const assistantRoutes = require("./routes/assistant");
 const rolesRoutes = require("./routes/roles");
 
 // API Routes
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/auth", authRoutes);
 app.use("/api/compliance", complianceRoutes);
 app.use("/api/suppliers", supplierRoutes);
@@ -54,6 +55,9 @@ app.use("/api/roles", rolesRoutes); // This is your roles endpoint
 
 // Root test route
 app.get("/", (req, res) => res.send("API running..."));
+app.post('/api/auth/login', (req, res) => {
+  // Handle login logic
+});
 
 // Server start
 const PORT = process.env.PORT || 5000;

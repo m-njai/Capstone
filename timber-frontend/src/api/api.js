@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000"; // Update when deployed
+const API_BASE_URL = "/api"; // Update when deployed
 
 // Inventory APIs
 export const getInventory = async () => axios.get(`${API_BASE_URL}/inventory`);

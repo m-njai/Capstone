@@ -21,7 +21,7 @@ function Register() {
 
   // 🔁 Fetch roles from backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/roles')
+    axios.get('/api/roles')
       .then(res => {
         const sorted = res.data.sort((a, b) => a.name.localeCompare(b.name));
         setRoles(sorted);
@@ -48,7 +48,7 @@ function Register() {
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const token = await userCredential.user.getIdToken();
 
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await axios.post('/api/auth/register', {
         name: form.name,
         email: form.email,
         roleId: form.roleId,

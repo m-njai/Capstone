@@ -6,7 +6,7 @@ const ComplianceUpload = ({ projectId }) => {
   const [form, setForm] = useState({ docType: "", expiryDate: "", file: null });
 
   const fetchDocs = async () => {
-    const res = await axios.get("http://localhost:5000/api/compliance");
+    const res = await axios.get("/api/compliance");
     setDocuments(res.data.documents);
   };
 
@@ -22,7 +22,7 @@ const ComplianceUpload = ({ projectId }) => {
     formData.append("docType", form.docType);
     formData.append("expiryDate", form.expiryDate);
 
-    await axios.post("http://localhost:5000/api/compliance/upload", formData);
+    await axios.post("/api/compliance/upload", formData);
     fetchDocs();
   };
 
@@ -45,7 +45,7 @@ const ComplianceUpload = ({ projectId }) => {
       <ul>
         {documents.map(doc => (
           <li key={doc.id}>
-            {doc.docType} — <strong>{doc.status}</strong> — <a href={`http://localhost:5000/${doc.filePath}`} target="_blank">View</a>
+          {doc.docType} — <strong>{doc.status}</strong> — <a href={`/${doc.filePath}`} target="_blank">View</a>
           </li>
         ))}
       </ul>

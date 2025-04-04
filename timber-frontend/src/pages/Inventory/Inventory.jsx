@@ -25,7 +25,7 @@ const Inventory = () => {
 
     const loadInventory = async () => {
         try {
-            const response = await axios.get("http://localhost:8000/api/inventory");
+            const response = await axios.get("/api/inventory");
             setInventory(response.data.inventory);
         } catch (error) {
             console.error("Error loading inventory:", error);
@@ -34,7 +34,7 @@ const Inventory = () => {
 
     const handleAddInventory = async () => {
         try {
-            await axios.post("http://localhost:8000/api/inventory", newItem);
+            await axios.post("/api/inventory", newItem);
             loadInventory();
             setNewItem({ category: "", name: "", quantity: 0, unit: "" });
         } catch (error) {

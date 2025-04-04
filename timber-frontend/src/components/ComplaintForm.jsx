@@ -6,7 +6,7 @@ const ComplaintForm = ({ projectId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:5000/api/complaints", {
+    await axios.post("/api/complaints", {
       ...form,
       projectId
     });

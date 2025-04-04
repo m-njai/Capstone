@@ -23,7 +23,7 @@ const CalendarView = ({ projectId }) => {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tasks", {
+    axios.get("/api/tasks", {
       params: { projectId }
     }).then(res => {
       const tasks = res.data;

@@ -5,7 +5,7 @@ const ProjectOverview = ({ projectId }) => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tasks", {
+    axios.get("/api/tasks", {
       params: { projectId }
     }).then(res => setTasks(res.data));
   }, [projectId]);

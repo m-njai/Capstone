@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import UserProfile from "./UserProfile";
-import PasswordSettings from "../../components/PasswordSettings";
-import AccountInfo from "../../components/AccountInfo";
-import PreferencesPanel from "../../components/PreferencesPanel";
+import UserProfile from "./UserProfile"; // Corrected path to pages/UserProfile.jsx
+import PasswordSettings from "../components/PasswordSettings";
+import AccountInfo from "../components/AccountInfo";
+import PreferencesPanel from "../components/PreferencesPanel";
 
 const SettingsDashboard = ({ userId }) => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -22,7 +22,6 @@ const SettingsDashboard = ({ userId }) => {
         {activeTab === "security" && <PasswordSettings userId={userId} />}
         {activeTab === "account" && <AccountInfo userId={userId} />}
         {activeTab === "prefs" && <PreferencesPanel userId={userId} />}
-
       </div>
     </div>
   );

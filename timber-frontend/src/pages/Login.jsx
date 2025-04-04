@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import background from '../photos/photo12.jpg'; // ✅ Background image
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import background from '../photos/photo12.jpg';
 
 function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -12,12 +13,32 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
-      localStorage.setItem('token', res.data.token);
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
+
+      const token = await userCredential.user.getIdToken(); // ✅ Firebase ID token
+
+      const res = await axios.post(
+        '/api/auth/login',
+        { email: form.email }, // 🔐 We only send email, since password was handled by Firebase
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ Auth header with token
+          },
+        }
+      );
+
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/dashboard');
     } catch (err) {
-      alert('Login failed. Please check your credentials.');
+      console.error('Login error:', err.response?.data || err.message);
+      alert(err.response?.data?.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -100,7 +121,7 @@ function Login() {
         </div>
       </header>
 
-      {/* Login Form Centered */}
+      {/* Login Form */}
       <main
         style={{
           flex: 1,
@@ -134,6 +155,7 @@ function Login() {
               type="email"
               onChange={handleChange}
               required
+              value={form.email}
               style={{
                 width: '100%',
                 padding: '0.7rem',
@@ -154,6 +176,7 @@ function Login() {
               type="password"
               onChange={handleChange}
               required
+              value={form.password}
               style={{
                 width: '100%',
                 padding: '0.7rem',

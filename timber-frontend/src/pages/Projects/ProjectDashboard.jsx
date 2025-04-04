@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 import ProjectOverview from "./ProjectOverview";
-import TaskBoard from "../../components/TaskBoard";
+import TaskBoard from '../../components/TaskBoard';
 import GanttTimeline from "../../components/GanttTimeline";
 import CalendarView from "../../components/CalendarView";
 
@@ -23,7 +23,7 @@ const ProjectDashboard = ({ projectId, role = "Admin" }) => {
   // Fetch tasks
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/tasks", { params: { projectId } })
+      .get("/api/tasks", { params: { projectId } })
       .then((res) => setTasks(res.data));
   }, [projectId]);
 

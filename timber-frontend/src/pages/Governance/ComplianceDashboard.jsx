@@ -10,7 +10,7 @@ const ComplianceDashboard = ({ projectId }) => {
   const [documents, setDocuments] = useState([]);
 
   const fetchDocs = async () => {
-    const res = await axios.get("http://localhost:5000/api/compliance");
+    const res = await axios.get("/api/compliance");
     setDocuments(res.data.documents || []);
   };
 
