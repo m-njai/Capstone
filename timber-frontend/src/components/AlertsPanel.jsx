@@ -2,42 +2,87 @@ import React, { useState, useEffect } from 'react';
 
 const AlertsPanel = () => {
   const [alerts, setAlerts] = useState([]);
+  const [error, setError] = useState(null);
 
-  // Fetch alerts on load
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
-    // Replace with your backend API endpoint for fetching alerts
-    fetch('/api/supplychain/alerts')
-      .then((response) => response.json())
-      .then((data) => setAlerts(data.alerts || []))
-      .catch((error) => console.error('Error fetching alerts:', error));
-  }, []);
+    const fetchAlerts = async () => {
+      try {
+        // Validate API URL
+        if (!API_URL.startsWith('http')) {
+          throw new Error('Invalid API URL');
+        }
+
+        const res = await fetch(`${API_URL}/api/supplychain/alerts`);
+        const contentType = res.headers.get('content-type');
+
+        // Check for response errors
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Invalid response format: Expected JSON');
+        }
+
+        const data = await res.json();
+
+        // Sanitize and validate alerts data
+        const sanitizedAlerts = (data.alerts || []).map((alert, index) => ({
+          id: alert.id || index, // Use alert id or fallback to index
+          title: alert?.title || 'Untitled Alert',
+          description: alert?.description || 'No description provided.',
+          timestamp: alert?.timestamp || new Date().toISOString(),
+        }));
+
+        setAlerts(sanitizedAlerts);
+      } catch (err) {
+        console.error('Error fetching alerts:', err);
+        setError(err.message || 'Failed to load alerts.');
+      }
+    };
+
+    fetchAlerts();
+  }, [API_URL]);
 
   return (
-    <div style={{ padding: 16, background: '#f9f9f9', borderRadius: 8 }}>
-      <h3>Alerts</h3>
-      {alerts.length > 0 ? (
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
-          {alerts.map((alert, index) => (
-            <li
-              key={index}
-              style={{
-                background: '#ffeeba',
-                marginBottom: 8,
-                padding: 8,
-                borderRadius: 4,
-                border: '1px solid #f5c6cb',
-              }}
-            >
-              <strong>{alert.title}</strong>
-              <p>{alert.description}</p>
-              <small>{new Date(alert.timestamp).toLocaleString()}</small>
-            </li>
-          ))}
+    <section
+      className="bg-yellow-100 border border-yellow-300 p-4 rounded-md"
+      aria-label="Alert Notifications"
+      aria-live="polite"
+    >
+      <h3 className="text-lg font-semibold mb-2 text-yellow-800">Alerts</h3>
+
+      {error ? (
+        <p className="text-red-600">{error}</p>
+      ) : alerts.length > 0 ? (
+        <ul className="space-y-3">
+          {alerts.map((alert) => {
+            const date = new Date(alert.timestamp);
+            return (
+              <li
+                key={alert.id}
+                className="bg-yellow-200 p-3 rounded shadow text-sm text-yellow-900"
+              >
+                <strong>{alert.title}</strong>
+                <p>{alert.description}</p>
+                <small className="text-xs block mt-1 italic text-gray-700">
+                  {isNaN(date) ? 'Invalid Date' : date.toLocaleString()}
+                </small>
+              </li>
+            );
+          })}
         </ul>
       ) : (
-        <p>No alerts at the moment.</p>
+        <p className="text-gray-600">No alerts at the moment.</p>
       )}
-    </div>
+
+      {import.meta.env.MODE === 'development' && (
+        <p className="text-xs text-gray-400 mt-2">
+          [Dev Mode] Endpoint: <code>{`${API_URL}/api/supplychain/alerts`}</code>
+        </p>
+      )}
+    </section>
   );
 };
 

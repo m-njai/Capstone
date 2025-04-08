@@ -19,8 +19,8 @@ app.use("/uploads", express.static("uploads")); // Static files
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://localhost:27017/supplierManagement")
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((error) => console.error("❌ MongoDB connection error:", error));
+  .then(() => console.log(" Connected to MongoDB"))
+  .catch((error) => console.error(" MongoDB connection error:", error));
 
 // ✅ Route imports
 const authRoutes = require("./routes/auth");
@@ -37,6 +37,9 @@ const invoiceRoutes = require("./routes/invoices");
 const assistantRoutes = require("./routes/assistant");
 const rolesRoutes = require("./routes/roles");
 const financeRoutes = require("./routes/finance");
+const inventoryRoutes = require("./routes/inventory");
+const supplyChainRoutes = require('./routes/supplychain');
+const sustainabilityRoutes = require("./routes/sustainability");
 
 // API Routes
 app.use("/api/auth", require("./routes/auth"));
@@ -54,6 +57,10 @@ app.use("/api/invoices", invoiceRoutes);
 app.use("/api/assistant", assistantRoutes);
 app.use("/api/roles", rolesRoutes); // This is your roles endpoint
 app.use("/api/finance", financeRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/supplyChain", supplyChainRoutes);
+app.use("/api/sustainability", sustainabilityRoutes);
+
 // Root test route
 app.get("/", (req, res) => res.send("API running..."));
 app.post('/api/auth/login', (req, res) => {

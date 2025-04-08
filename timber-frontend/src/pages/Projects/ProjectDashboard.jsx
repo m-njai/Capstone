@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 import ProjectOverview from "./ProjectOverview";
-import TaskBoard from '../../components/TaskBoard';
+import TaskBoard from "../../components/TaskBoard";
 import GanttTimeline from "../../components/GanttTimeline";
 import CalendarView from "../../components/CalendarView";
 
@@ -15,22 +16,20 @@ const tabs = [
   { label: "Calendar", key: "calendar", roles: ["Admin", "Project Manager"] },
 ];
 
-const ProjectDashboard = ({ projectId, role = "Admin" }) => {
+const ProjectDashboard = ({ role = "Admin" }) => {
+  const { projectId } = useParams(); // ✅ Get from route
   const [tasks, setTasks] = useState([]);
   const [projectName, setProjectName] = useState("Smart Timber Project");
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Fetch tasks
   useEffect(() => {
     axios
       .get("/api/tasks", { params: { projectId } })
       .then((res) => setTasks(res.data));
   }, [projectId]);
 
-  // Filter tabs based on user role
   const visibleTabs = tabs.filter((tab) => tab.roles.includes(role));
 
-  // Generate PDF Report
   const generatePDF = () => {
     if (role !== "Admin") return alert("Access denied");
 
@@ -48,7 +47,6 @@ const ProjectDashboard = ({ projectId, role = "Admin" }) => {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text("Project Summary Report", 14, 20);
-
     doc.setFontSize(12);
     doc.text(`Project: ${projectName}`, 14, 30);
     doc.text(`Total Tasks: ${total}`, 14, 40);
@@ -70,7 +68,6 @@ const ProjectDashboard = ({ projectId, role = "Admin" }) => {
     <div style={{ padding: 20 }}>
       <h2>{projectName} – Project Dashboard</h2>
 
-      {/* Tabs Navigation */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           {visibleTabs.map((tab) => (
@@ -96,7 +93,6 @@ const ProjectDashboard = ({ projectId, role = "Admin" }) => {
         )}
       </div>
 
-      {/* Tab Content */}
       <div style={{ marginTop: 30 }}>
         {activeTab === "overview" && <ProjectOverview projectId={projectId} />}
         {activeTab === "kanban" && <TaskBoard projectId={projectId} role={role} />}
