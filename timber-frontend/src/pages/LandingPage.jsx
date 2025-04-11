@@ -1,292 +1,241 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  MenuItem,
+  Select,
+  Typography,
+  Grid,
+  Divider,
+  IconButton,
+  Box
+} from '@mui/material';
+import { Pie } from 'react-chartjs-2';
+import { LayoutDashboard, Trash2, Pencil } from 'lucide-react';
 
-// Slideshow Images
-import photo1 from '../photos/photo1.jpg';
-import photo4 from '../photos/photo4.jpg';
-import photo7 from '../photos/photo7.jpg';
-import photo15 from '../photos/photo15.jpg';
-import photo22 from '../photos/photo22.jpg';
-import photo55 from '../photos/photo55.jpg';
-
-// Feature Images
-import projectImg from '../photos/photo29.jpg';
-import supplyChainImg from '../photos/photo28.jpg';
-import financeImg from '../photos/photo26.jpg';
-import complianceImg from '../photos/photo23.jpg';
-import sustainabilityImg from '../photos/photo20.jpg';
-import aiImg from '../photos/photo4.jpg';
-
-const LandingPage = ({ isAuthenticated }) => {
+const InventoryDashboard = () => {
   const navigate = useNavigate();
+  const [inventory, setInventory] = useState([]);
+  const [newItem, setNewItem] = useState({ category: '', name: '', quantity: 0, unit: '' });
+  const [editingItem, setEditingItem] = useState(null);
 
-  // Background slideshow state
-  const [currentImage, setCurrentImage] = useState(0);
-  const images = [photo1, photo4, photo7, photo15, photo22, photo55];
+  const categories = [
+    'Foundation and Groundwork',
+    'Timber Framing and Structural Components',
+    'Roofing',
+    'Exterior Cladding',
+    'Windows and Doors',
+    'Interior Finishes',
+    'Utilities and Fixtures',
+    'Landscaping and Outdoor Features'
+  ];
+
+  const units = ['cubic meters', 'kg', 'pieces', 'liters'];
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prevIndex) => (prevIndex + 1) % images.length);
-    }, 4000);
-    return () => clearInterval(interval);
+    loadInventory();
   }, []);
 
+  const loadInventory = async () => {
+    try {
+      const response = await axios.get('/api/inventory');
+      setInventory(response.data.inventory);
+    } catch (error) {
+      console.error('Error loading inventory:', error);
+    }
+  };
+
+  const handleAddInventory = async () => {
+    try {
+      if (editingItem) {
+        await axios.put(`/api/inventory/${editingItem._id}`, newItem);
+      } else {
+        await axios.post('/api/inventory', newItem);
+      }
+      loadInventory();
+      setNewItem({ category: '', name: '', quantity: 0, unit: '' });
+      setEditingItem(null);
+    } catch (error) {
+      console.error('Error saving inventory:', error);
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingItem(item);
+    setNewItem({ category: item.category, name: item.name, quantity: item.quantity, unit: item.unit });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/inventory/${id}`);
+      loadInventory();
+    } catch (error) {
+      console.error('Error deleting inventory:', error);
+    }
+  };
+
+  const categorySummary = categories.reduce((acc, category) => {
+    acc[category] = inventory.filter(item => item.category === category).reduce((sum, item) => sum + item.quantity, 0);
+    return acc;
+  }, {});
+
+  const pieData = {
+    labels: Object.keys(categorySummary),
+    datasets: [
+      {
+        data: Object.values(categorySummary),
+        backgroundColor: [
+          '#4caf50', '#2196f3', '#ff9800', '#9c27b0',
+          '#00bcd4', '#e91e63', '#ffc107', '#8bc34a'
+        ]
+      }
+    ]
+  };
+
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
-      {/* Branded Header */}
-      <header style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "1.5rem 2rem",
-        backgroundColor: "#1f2937",
-        color: "#fff"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{
-            width: "40px",
-            height: "40px",
-            backgroundColor: "#93c5fd",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-            fontSize: "1.2rem",
-            color: "#1f2937"
-          }}>
-            SG
-          </div>
-          <h1 style={{ fontSize: "1.5rem", margin: 0 }}>SmartGrain Systems</h1>
+    <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: 1.5 }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 2rem', backgroundColor: '#1f2937', color: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ width: '40px', height: '40px', backgroundColor: '#93c5fd', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: '#1f2937' }}>SG</div>
+          <h1 style={{ fontSize: '1.5rem', margin: 0 }}>SmartGrain Inventory</h1>
         </div>
-        <div>
-          <button
-            onClick={() => navigate("/login")}
-            style={{
-              marginRight: "1rem",
-              padding: "0.5rem 1.2rem",
-              fontSize: "1rem",
-              backgroundColor: "transparent",
-              border: "1px solid #93c5fd",
-              color: "#93c5fd",
-              borderRadius: "6px",
-              cursor: "pointer"
-            }}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => navigate("/register")}
-            style={{
-              padding: "0.5rem 1.2rem",
-              fontSize: "1rem",
-              backgroundColor: "#3b82f6",
-              border: "none",
-              color: "#fff",
-              borderRadius: "6px",
-              cursor: "pointer"
-            }}
-          >
-            Sign Up
-          </button>
-        </div>
+        <button onClick={() => navigate('/dashboard')} style={{ padding: '0.5rem 1rem', backgroundColor: '#3b82f6', color: '#fff', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <LayoutDashboard /> Home
+        </button>
       </header>
 
-      {/* Hero Section with animated background */}
-      <section
-        style={{
-          padding: "6rem 2rem",
-          textAlign: "center",
-          backgroundImage: `url(${images[currentImage]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "#fff",
-          transition: "background-image 1s ease-in-out",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1,
-          }}
-        />
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>
-            Smart Timber Construction, Powered by TECH
-          </h1>
-          <p style={{ fontSize: "1.2rem", maxWidth: "600px", margin: "0 auto 2rem" }}>
-            Streamline supply chains, manage your site, and stay compliant — all from a single, intelligent platform built for the construction industry.
-          </p>
-          <button
-            onClick={() => navigate("/register")}
-            style={{
-              padding: "0.75rem 1.5rem",
-              fontSize: "1rem",
-              backgroundColor: "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer"
-            }}
-          >
-            Get Started
-          </button>
-        </div>
-      </section>
+      <main style={{ backgroundColor: '#f9fafb', padding: '2rem' }}>
+        <Typography variant="h4" gutterBottom style={{ color: '#1f2937', fontWeight: 600 }}>Inventory Dashboard</Typography>
 
-      {/* Feature Section */}
-      <section style={{ padding: "3rem 2rem", backgroundColor: "#ffffff" }}>
-        <h2 style={{ textAlign: "center", fontSize: "2rem", marginBottom: "2rem" }}>Core Features</h2>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "2rem",
-          }}
-        >
-          {[
-            {
-              title: "Project Management",
-              desc: "Gantt charts, Kanban boards, and calendar views for smooth scheduling.",
-              image: projectImg,
-            },
-            {
-              title: "Supply Chain",
-              desc: "Order materials, track shipments, and monitor supplier performance.",
-              image: supplyChainImg,
-            },
-            {
-              title: "Financial Planning",
-              desc: "Manage budgets, invoices, and generate financial reports.",
-              image: financeImg,
-            },
-            {
-              title: "Compliance",
-              desc: "Track documentation and stay aligned with local regulations.",
-              image: complianceImg,
-            },
-            {
-              title: "Sustainability",
-              desc: "Monitor eco-impact and Green Star performance.",
-              image: sustainabilityImg,
-            },
-            {
-              title: "AI Assistant",
-              desc: "Smart suggestions for next steps, warnings, and insights.",
-              image: aiImg,
-            },
-          ].map((feature, index) => (
-            <div
-              key={index}
-              style={{
-                flex: "1 1 300px",
-                maxWidth: "100%",
-                borderRadius: "12px",
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                textAlign: "left",
-                backgroundColor: "#fff",
-                transition: "transform 0.3s ease",
-              }}
-            >
-              <img
-                src={feature.image}
-                alt={feature.title}
-                style={{
-                  width: "100%",
-                  height: "180px",
-                  objectFit: "cover",
-                  display: "block",
-                }}
+        <Grid container spacing={4} style={{ marginBottom: '2rem' }}>
+          <Grid item xs={12} md={6}>
+            <Paper style={{ padding: '1rem' }}>
+              <Typography variant="h6" gutterBottom>Inventory Distribution by Category</Typography>
+              <Pie data={pieData} />
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper style={{ padding: '1rem', height: '100%' }}>
+              <Typography variant="h6" gutterBottom>Total Inventory Items: {inventory.length}</Typography>
+              <ul>
+                {Object.entries(categorySummary).map(([cat, qty]) => (
+                  <li key={cat}><strong>{cat}</strong>: {qty}</li>
+                ))}
+              </ul>
+            </Paper>
+          </Grid>
+        </Grid>
+
+        <Divider style={{ margin: '2rem 0' }} />
+
+        <Typography variant="h5" gutterBottom>Inventory List</Typography>
+        <TableContainer component={Paper} style={{ marginBottom: '2rem' }}>
+          <Table>
+            <TableHead>
+              <TableRow style={{ backgroundColor: '#f3f4f6' }}>
+                <TableCell><strong>Category</strong></TableCell>
+                <TableCell><strong>Name</strong></TableCell>
+                <TableCell><strong>Quantity</strong></TableCell>
+                <TableCell><strong>Unit</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inventory.map((item) => (
+                <TableRow key={item._id}>
+                  <TableCell>{item.category}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item.unit}</TableCell>
+                  <TableCell>
+                    <IconButton color="primary" onClick={() => handleEdit(item)}><Pencil size={16} /></IconButton>
+                    <IconButton color="error" onClick={() => handleDelete(item._id)}><Trash2 size={16} /></IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Divider style={{ marginBottom: '2rem' }} />
+
+        <Typography variant="h5" gutterBottom>{editingItem ? 'Edit Inventory Item' : 'Add New Inventory'}</Typography>
+        <Paper elevation={3} style={{ padding: '1.5rem', marginTop: '1rem' }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Typography variant="body2" gutterBottom>Category</Typography>
+              <Select
+                value={newItem.category}
+                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                displayEmpty
+                fullWidth
+              >
+                <MenuItem value="" disabled>Select Category</MenuItem>
+                {categories.map((category) => (
+                  <MenuItem key={category} value={category}>{category}</MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="body2" gutterBottom>Item Name</Typography>
+              <TextField
+                placeholder="e.g. Treated Pine Plank"
+                value={newItem.name}
+                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                fullWidth
               />
-              <div style={{ padding: "1.2rem" }}>
-                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.2rem" }}>{feature.title}</h3>
-                <p style={{ fontSize: "0.95rem", color: "#555" }}>{feature.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="body2" gutterBottom>Quantity</Typography>
+              <TextField
+                type="number"
+                placeholder="Enter quantity"
+                value={newItem.quantity}
+                onChange={(e) => setNewItem({ ...newItem, quantity: +e.target.value })}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="body2" gutterBottom>Unit</Typography>
+              <Select
+                value={newItem.unit}
+                onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
+                displayEmpty
+                fullWidth
+              >
+                <MenuItem value="" disabled>Select Unit</MenuItem>
+                {units.map((unit) => (
+                  <MenuItem key={unit} value={unit}>{unit}</MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" color="primary" onClick={handleAddInventory}>
+                {editingItem ? 'Update Item' : 'Add Inventory Item'}
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+      </main>
 
-      {/* Benefits */}
-      <section style={{ padding: "3rem 2rem", backgroundColor: "#f9fafb" }}>
-        <h2 style={{ textAlign: "center", fontSize: "2rem", marginBottom: "2rem" }}>Why Choose Us?</h2>
-        <ul style={{ maxWidth: "700px", margin: "0 auto", listStyle: "none", padding: 0 }}>
-          {[
-            "Save time and cut delays with automated workflows.",
-            "Boost project transparency and team collaboration.",
-            "Meet local compliance standards effortlessly.",
-            "Minimize costs and track financial performance.",
-            "Make data-driven decisions using AI insights.",
-          ].map((benefit, index) => (
-            <li key={index} style={{ marginBottom: "1rem", fontSize: "1.1rem" }}>
-               {benefit}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Who It's For */}
-      <section style={{ padding: "3rem 2rem", backgroundColor: "#ffffff" }}>
-        <h2 style={{ textAlign: "center", fontSize: "2rem", marginBottom: "2rem" }}>Built For</h2>
-        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "2rem" }}>
-          {["Builders", "Project Managers", "Suppliers", "Sustainability Officers", "Finance Teams"].map((role, index) => (
-            <div
-              key={index}
-              style={{
-                backgroundColor: "#e0f2fe",
-                padding: "1rem 2rem",
-                borderRadius: "10px",
-                fontWeight: "bold"
-              }}
-            >
-              {role}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section style={{ padding: "3rem 2rem", backgroundColor: "#dbeafe", textAlign: "center" }}>
-        <h2>Ready to Build Smarter?</h2>
-        <button
-          onClick={() => navigate("/register")}
-          style={{
-            marginTop: "1rem",
-            padding: "0.75rem 1.5rem",
-            fontSize: "1rem",
-            backgroundColor: "#1d4ed8",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer"
-          }}
-        >
-          Create Free Account
-        </button>
-      </section>
-
-      {/* Footer */}
-      <footer style={{ padding: "1.5rem 2rem", backgroundColor: "#1f2937", color: "#fff", textAlign: "center" }}>
+      <footer style={{ padding: '1.5rem 2rem', backgroundColor: '#1f2937', color: '#fff', textAlign: 'center', marginTop: '3rem' }}>
         <p>&copy; {new Date().getFullYear()} SmartGrain Systems</p>
-        <div style={{ marginTop: "0.5rem" }}>
-          <a href="/privacy" style={{ color: "#93c5fd", marginRight: "1rem" }}>Privacy</a>
-          <a href="/terms" style={{ color: "#93c5fd" }}>Terms</a>
+        <div style={{ marginTop: '0.5rem' }}>
+          <a href="/privacy" style={{ color: '#93c5fd', marginRight: '1rem' }}>Privacy</a>
+          <a href="/terms" style={{ color: '#93c5fd' }}>Terms</a>
         </div>
       </footer>
     </div>
   );
 };
 
-export default LandingPage;
+export default InventoryDashboard;

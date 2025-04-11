@@ -1,22 +1,22 @@
+// models/Invoice.js
 const mongoose = require("mongoose");
 
 const InvoiceSchema = new mongoose.Schema({
-  projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
-  clientName: String,
-  clientEmail: String,
-  invoiceDate: { type: Date, default: Date.now },
-  dueDate: Date,
-  status: { type: String, enum: ["Draft", "Sent", "Paid", "Overdue"], default: "Draft" },
+  clientName: { type: String, required: true },
+  clientEmail: { type: String, required: true },
+  invoiceDate: { type: Date, required: true },
+  dueDate: { type: Date, required: true },
+  taxRate: { type: Number, required: true },
   items: [
     {
-      description: String,
-      quantity: Number,
-      rate: Number,
-      total: Number
+      description: { type: String, required: true },
+      quantity: { type: Number, required: true },
+      rate: { type: Number, required: true },
+      total: { type: Number, required: true }
     }
   ],
-  taxRate: { type: Number, default: 0 },
-  notes: String
-}, { timestamps: true });
+  notes: { type: String },
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project" }
+});
 
 module.exports = mongoose.model("Invoice", InvoiceSchema);

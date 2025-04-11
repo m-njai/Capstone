@@ -1,113 +1,174 @@
-// Flexible Dashboard Component with All Features for All Users
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  DollarSign,
+  Truck,
+  PackageSearch,
+  ShieldCheck,
+  Settings
+} from "lucide-react";
+
 import ProjectOverview from "../pages/Projects/ProjectOverview";
 import FinancialDashboard from "../pages/Financials/FinancialDashboard";
 import SupplyChainDashboard from "../pages/SupplyChain/SupplyChainDashboard";
-import SustainabilityDashboard from "../pages/Governance/SustainabilityDashboard";
+import ComplianceDashboard from "../pages/Governance/ComplianceDashboard";
 import InventoryDashboard from "../pages/Inventory/InventoryDashboard";
-import UserProfile from "../pages/UserProfile";
-import photo45 from "../photos/photo13.jpg";
-import "../css/index.css"; // Tailwind CSS loaded globally
+import OrderManager from "../components/OrderManager";
+import Suppliers from "../pages/SupplyChain/Suppliers";
+import DashboardImage from "../components/DashboardImage";
+
+import ImageFinance from "../photos/photo26.jpg";
+import ImageSupplyChain from "../photos/photo28.jpg";
+import ImageProject from "../photos/photo30.jpg";
+import ImageInventory from "../photos/photo27.jpg";
+import ImageSuppliers from "../photos/photo66.jpg";
+import ImageCompliance from "../photos/photo71.jpg";
+import photoHero1 from '../photos/photo1.jpg';
+import photoHero2 from '../photos/photo15.jpg';
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const [currentHero, setCurrentHero] = useState(0);
+  const heroImages = [photoHero1, photoHero2];
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setUser(parsed);
-      } catch (error) {
-        console.error("Failed to parse user data:", error);
-      }
-    }
+    const interval = setInterval(() => {
+      setCurrentHero((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
+  const buttons = [
+    { label: "Projects", icon: <LayoutDashboard />, path: "/projects" },
+    { label: "Financials", icon: <DollarSign />, path: "/financials" },
+    { label: "Supply Chain", icon: <Truck />, path: "/supply-chain" },
+    { label: "Inventory", icon: <PackageSearch />, path: "/inventory" },
+    { label: "Governance", icon: <ShieldCheck />, path: "/governance" },
+    { label: "Settings", icon: <Settings />, path: "/settings" },
+  ];
+
   return (
-    <div
-      className="min-h-screen flex flex-col text-gray-800 bg-cover bg-center"
-      style={{ backgroundImage: `url(${photo45})` }}
-    >
-      <header className="bg-gray-800 bg-opacity-90 text-white px-6 py-4 flex flex-wrap justify-between items-center">
-        <h1 className="text-2xl font-bold">SmartGrain Dashboard</h1>
-        <nav className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-          <NavButton onClick={() => navigate("/projects")} label="Projects" />
-          <NavButton onClick={() => navigate("/financial-plan")} label="Financials" />
-          <NavButton onClick={() => navigate("/supply-chain")} label="Supply Chain" />
-          <NavButton onClick={() => navigate("/sustainability")} label="Sustainability" />
-          <NavButton onClick={() => navigate("/inventory")} label="Inventory" />
-          <NavButton onClick={() => navigate("/governance")} label="Governance" />
-          <NavButton onClick={() => navigate("/settings")} label="Settings" />
+    <div style={{ fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
+      {/* Header */}
+      <header style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "1.5rem 2rem",
+        backgroundColor: "#1f2937",
+        color: "#fff"
+      }}>
+        <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>SmartGrain Dashboard</h1>
+        <nav style={{ display: "flex", gap: "0.75rem" }}>
+          {buttons.map(({ label, icon, path }, index) => (
+            <button
+              key={index}
+              onClick={() => navigate(path)}
+              style={{
+                padding: "0.5rem 1rem",
+                border: "none",
+                backgroundColor: "#3b82f6",
+                color: "#fff",
+                borderRadius: "6px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem"
+              }}
+            >
+              {icon}
+              {label}
+            </button>
+          ))}
         </nav>
       </header>
 
-      <main className="flex-1 px-6 py-4 space-y-10">
-        <h2 className="text-xl sm:text-2xl font-semibold">
-          {user ? `Welcome, ${user.name}` : "Welcome to the Dashboard"}
-        </h2>
+      {/* Hero Banner */}
+      <section style={{
+        padding: "6rem 2rem",
+        textAlign: "center",
+        backgroundImage: `url(${heroImages[currentHero]})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        color: "#fff",
+        transition: "background-image 1s ease-in-out",
+        position: "relative"
+      }}>
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 1
+        }} />
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <h2 style={{ fontSize: "2.5rem" }}>Welcome to SmartGrain Dashboard</h2>
+          <p style={{ fontSize: "1.2rem", maxWidth: "600px", margin: "1rem auto" }}>
+            Manage your projects, financials, and supply chain effectively from one place.
+          </p>
+        </div>
+      </section>
 
-        <DashboardSection id="profile" title="Your Profile">
-          <UserProfile />
-        </DashboardSection>
+      {/* Main Content */}
+      <main style={{ padding: "2rem" }}>
+        <ProjectOverview />
+        <DashboardImage
+          src={ImageProject}
+          alt="Overview Visual"
+          caption="Project Overview – Key activities and tasks summary"
+        />
 
-        <DashboardSection id="project" title="Project Overview">
-          <ProjectOverview />
-        </DashboardSection>
+        <FinancialDashboard />
+        <DashboardImage
+          src={ImageFinance}
+          alt="Finance Snapshot"
+          caption="Financial Dashboard – Budget and expenses overview"
+        />
 
-        <DashboardSection id="financial" title="Financial Summary">
-          <FinancialDashboard />
-        </DashboardSection>
+        <SupplyChainDashboard />
+        <DashboardImage
+          src={ImageSupplyChain}
+          alt="Supply Flow"
+          caption="Supply Chain Flow – From supplier to site"
+        />
 
-        <DashboardSection id="supply-inventory" title="Supply & Inventory Overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-lg font-medium mb-2">Supply Chain</h4>
-              <SupplyChainDashboard />
-            </div>
-            <div>
-              <h4 className="text-lg font-medium mb-2">Inventory Overview</h4>
-              <InventoryDashboard />
-            </div>
-          </div>
-        </DashboardSection>
+        <InventoryDashboard />
+        <DashboardImage
+          src={ImageInventory}
+          alt="Inventory Visualization"
+          caption="Inventory Levels – Stock tracking by category"
+        />
 
-        <DashboardSection id="sustainability" title="Sustainability">
-          <SustainabilityDashboard />
-        </DashboardSection>
+        <OrderManager />
+        <Suppliers />
+        <DashboardImage
+          src={ImageSuppliers}
+          alt="Suppliers Chart"
+          caption="Top-rated Supplier Distribution"
+        />
+
+        <ComplianceDashboard />
+        <DashboardImage
+          src={ImageCompliance}
+          alt="Compliance Insight"
+          caption="Compliance & Governance – Permit status and sustainability"
+        />
       </main>
 
-      <footer className="bg-green-900 text-white py-4 text-center">
-        <p>&copy; {new Date().getFullYear()} SmartGrain Systems</p>
+      {/* Footer */}
+      <footer style={{
+        padding: "1.5rem 2rem",
+        backgroundColor: "#1f2937",
+        color: "#fff",
+        textAlign: "center"
+      }}>
+        © {new Date().getFullYear()} SmartGrain Systems. All rights reserved.
       </footer>
     </div>
   );
 };
-
-const NavButton = ({ onClick, label }) => (
-  <button
-    onClick={onClick}
-    className="bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-md text-sm sm:text-base"
-  >
-    {label}
-  </button>
-);
-
-const DashboardSection = ({ id, title, children }) => (
-  <section id={id} className="space-y-2">
-    <div className="flex justify-between items-center">
-      <h3 className="text-lg font-semibold text-green-800">{title}</h3>
-      <a
-        href={`#${id}`}
-        className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 text-sm"
-      >
-        Go to {title}
-      </a>
-    </div>
-    <div>{children}</div>
-  </section>
-);
 
 export default Dashboard;

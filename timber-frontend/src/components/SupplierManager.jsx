@@ -21,7 +21,7 @@ const SupplierManager = () => {
   const fetchSuppliers = async () => {
     try {
       const res = await axios.get("/api/suppliers");
-      setSuppliers(res.data.suppliers || res.data); // Support either structure
+      setSuppliers(res.data.suppliers || res.data); // Support flexible API format
     } catch (err) {
       alert("Error fetching suppliers.");
     }
@@ -31,7 +31,7 @@ const SupplierManager = () => {
     fetchSuppliers();
   }, []);
 
-  // Handle input changes
+  // Handle form input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -53,6 +53,8 @@ const SupplierManager = () => {
         await axios.post("/api/suppliers", form);
         alert("Supplier added successfully.");
       }
+
+      // Reset form
       setForm({
         name: "",
         contactPerson: "",
@@ -72,14 +74,14 @@ const SupplierManager = () => {
     }
   };
 
-  // Handle edit mode
+  // Handle edit
   const handleEdit = (supplier) => {
     setForm(supplier);
     setEditId(supplier.id);
     setEditMode(true);
   };
 
-  // Handle supplier deletion
+  // Handle delete
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this supplier?")) return;
 
@@ -92,12 +94,11 @@ const SupplierManager = () => {
     }
   };
 
-  // Render component
   return (
     <div style={{ padding: 20 }}>
       <h2>Supplier Management</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20 }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: 20, display: "grid", gap: "10px" }}>
         <input
           name="name"
           placeholder="Supplier Name"
@@ -155,16 +156,22 @@ const SupplierManager = () => {
           onChange={handleChange}
           required
         />
-        <button type="submit">{editMode ? "Update" : "Add"} Supplier</button>
+        <button type="submit">
+          {editMode ? "Update Supplier" : "Add Supplier"}
+        </button>
       </form>
 
       <ul>
-        {suppliers.map((s) => (
-          <li key={s.id}>
+        {suppliers.map((s, index) => (
+          <li key={s.id || `supplier-${index}`} style={{ marginBottom: "12px" }}>
             <strong>{s.name}</strong> — {s.location || "No location"} — {s.contact || "No contact"}
-            <div>
-              <button onClick={() => handleEdit(s)}>Edit</button>
-              <button onClick={() => handleDelete(s.id)}>Delete</button>
+            <div style={{ marginTop: "4px" }}>
+              <button onClick={() => handleEdit(s)} style={{ marginRight: "8px" }}>
+                Edit
+              </button>
+              <button onClick={() => handleDelete(s.id)} style={{ color: "red" }}>
+                Delete
+              </button>
             </div>
           </li>
         ))}

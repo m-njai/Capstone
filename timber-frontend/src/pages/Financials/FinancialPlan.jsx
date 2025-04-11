@@ -25,7 +25,7 @@ function FinancialPlan() {
   };
 
   const fetchPlans = async () => {
-    const res = await axios.get('/api/finance/my-plans', { headers });
+    const res = await axios.get('/api/financial-planning/my-plans', { headers });
     setPlans(res.data);
   };
 
