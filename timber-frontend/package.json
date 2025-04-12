@@ -42,7 +42,7 @@
     "react-router-dom": "^7.4.0",
     "react-toastify": "^11.0.5",
     "styled-components": "^6.1.16",
-    "yet-another-react-lightbox": "^3.21.8"
+    "yet-another-react-lightbox": "^3.22.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

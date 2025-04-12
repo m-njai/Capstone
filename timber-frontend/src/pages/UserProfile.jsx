@@ -12,9 +12,8 @@ const UserProfile = ({ userId }) => {
   useEffect(() => {
     if (!userId) {
       console.error("User ID is undefined");
-      return; // Exit if userId is not provided
+      return;
     }
-    // Fetch user data safely
     const fetchUserData = async () => {
       try {
         const res = await axios.get(`/api/users/${userId}`);
@@ -22,7 +21,7 @@ const UserProfile = ({ userId }) => {
           name: res.data.name,
           email: res.data.email,
           phone: res.data.phone || "",
-          role: res.data.role || "N/A"
+          role: res.data.role || "N/A",
         });
         setPreview(res.data.avatar);
       } catch (err) {
@@ -48,13 +47,9 @@ const UserProfile = ({ userId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!userId) {
-        throw new Error("User ID is undefined");
-      }
-      // Update user profile details
+      if (!userId) throw new Error("User ID is undefined");
       await axios.put(`/api/users/${userId}`, form);
 
-      // Upload avatar if present
       if (avatar) {
         const data = new FormData();
         data.append("avatar", avatar);
@@ -70,10 +65,7 @@ const UserProfile = ({ userId }) => {
 
   const handlePasswordChange = async () => {
     try {
-      if (!userId) {
-        throw new Error("User ID is undefined");
-      }
-      // Update the password
+      if (!userId) throw new Error("User ID is undefined");
       await axios.put(`/api/users/${userId}/change-password`, passwords);
       alert("Password changed successfully");
       setPasswords({ currentPassword: "", newPassword: "" });
@@ -85,77 +77,97 @@ const UserProfile = ({ userId }) => {
   };
 
   return (
-    <div>
-      <h3>My Profile</h3>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Name"
-        />
-        <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email"
-        />
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-        />
-        <p><strong>Role:</strong> {form.role}</p>
+    <div className="p-6 bg-white shadow rounded">
+      <h3 className="text-xl font-semibold mb-4">My Profile</h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Name"
+            className="border p-2 rounded w-full"
+          />
+          <input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="border p-2 rounded w-full"
+          />
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="Phone"
+            className="border p-2 rounded w-full"
+          />
+          <div className="flex items-center">
+            <strong>Role:</strong>
+            <span className="ml-2">{form.role}</span>
+          </div>
+        </div>
 
-        <div>
-          <p>Avatar:</p>
+        <div className="mt-4">
+          <p className="font-medium mb-2">Avatar:</p>
           {preview && (
             <img
               src={preview}
               alt="Avatar"
-              width={100}
-              style={{ borderRadius: "50%" }}
+              className="w-24 h-24 rounded-full object-cover border-2 border-gray-300 mb-2"
             />
           )}
-          <input type="file" onChange={handleAvatarChange} />
+          <input type="file" onChange={handleAvatarChange} className="block" />
         </div>
 
-        <button type="submit">Save Profile</button>
-        {status === "success" && <p>Profile updated!</p>}
-        {status === "error" && <p>Update failed. Try again.</p>}
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Save Profile
+        </button>
+
+        {status === "success" && <p className="text-green-600 mt-2">Profile updated!</p>}
+        {status === "error" && <p className="text-red-600 mt-2">Update failed. Try again.</p>}
       </form>
 
-      {/* Password Change Section */}
-      {showPasswordForm ? (
-        <div>
-          <input
-            type="password"
-            placeholder="Current Password"
-            name="currentPassword"
-            value={passwords.currentPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, currentPassword: e.target.value })
-            }
-          />
-          <input
-            type="password"
-            placeholder="New Password"
-            name="newPassword"
-            value={passwords.newPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, newPassword: e.target.value })
-            }
-          />
-          <button type="button" onClick={handlePasswordChange}>
-            Save Password
+      <div className="mt-6">
+        {showPasswordForm ? (
+          <div className="space-y-2">
+            <input
+              type="password"
+              placeholder="Current Password"
+              name="currentPassword"
+              value={passwords.currentPassword}
+              onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
+              className="border p-2 rounded w-full"
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              name="newPassword"
+              value={passwords.newPassword}
+              onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+              className="border p-2 rounded w-full"
+            />
+            <button
+              type="button"
+              onClick={handlePasswordChange}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Save Password
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowPasswordForm(true)}
+            className="mt-4 text-blue-600 hover:underline"
+          >
+            Change Password
           </button>
-        </div>
-      ) : (
-        <button type="button" onClick={() => setShowPasswordForm(true)}>
-          Change Password
-        </button>
-      )}
+        )}
+      </div>
     </div>
   );
 };

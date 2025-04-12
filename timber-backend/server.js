@@ -5,24 +5,24 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const connectDB = require("./db");
-require("./scheduler"); // Import the scheduler
+require("./scheduler"); // Task scheduler
 require("./firebaseAdmin"); // Firebase Admin SDK init
 
 const app = express();
 
 // Middleware
-app.use(cors()); // Must come before routes
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads")); // Static files
+app.use("/uploads", express.static("uploads"));
 
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://localhost:27017/supplierManagement")
-  .then(() => console.log(" Connected to MongoDB"))
-  .catch((error) => console.error(" MongoDB connection error:", error));
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((error) => console.error("❌ MongoDB connection error:", error));
 
-// ✅ Route imports
+// ✅ Route Imports
 const authRoutes = require("./routes/auth");
 const complianceRoutes = require("./routes/compliance");
 const supplierRoutes = require("./routes/suppliers");
@@ -30,7 +30,7 @@ const tasksRoutes = require("./routes/tasks");
 const inventoryTransactionsRoutes = require("./routes/inventory");
 const financialPlanningRoutes = require("./routes/financialPlanning");
 const leadsRoutes = require("./routes/leads");
-const projectShowcaseRoutes = require("./routes/projectShowcase");
+const projectShowcaseRoutes = require("./routes/projectShowcase"); // renamed
 const newsletterRoutes = require("./routes/subscribers");
 const usersRoutes = require("./routes/users");
 const invoiceRoutes = require("./routes/invoices");
@@ -38,11 +38,12 @@ const assistantRoutes = require("./routes/assistant");
 const rolesRoutes = require("./routes/roles");
 const financeRoutes = require("./routes/finance");
 const inventoryRoutes = require("./routes/inventory");
-const supplyChainRoutes = require('./routes/supplychain');
+const supplyChainRoutes = require("./routes/supplychain");
 const sustainabilityRoutes = require("./routes/sustainability");
+const projectRoutes = require("./routes/projects");
+const showcaseUploadRoutes = require("./routes/showcase"); // renamed
 
-// API Routes
-app.use("/api/auth", require("./routes/auth"));
+// ✅ API Route Mounting
 app.use("/api/auth", authRoutes);
 app.use("/api/compliance", complianceRoutes);
 app.use("/api/suppliers", supplierRoutes);
@@ -55,17 +56,16 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/assistant", assistantRoutes);
-app.use("/api/roles", rolesRoutes); // This is your roles endpoint
+app.use("/api/roles", rolesRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/supplyChain", supplyChainRoutes);
 app.use("/api/sustainability", sustainabilityRoutes);
+app.use("/api/projects", projectRoutes); // Consider merging this with projectShowcase if overlapping
+app.use("/api/showcase", showcaseUploadRoutes); // ✅ final image upload showcase route
 
-// Root test route
+// Root route
 app.get("/", (req, res) => res.send("API running..."));
-app.post('/api/auth/login', (req, res) => {
-  // Handle login logic
-});
 
 // Server start
 const PORT = process.env.PORT || 5000;

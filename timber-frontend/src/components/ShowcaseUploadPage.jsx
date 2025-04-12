@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Upload, Tag, ImagePlus } from "lucide-react"; // Optional: use any icon library
+import { Upload, Tag, ImagePlus } from "lucide-react";
 
 const tagOptions = ["Residential", "Commercial", "Eco-friendly", "Renovation", "Interior"];
 
@@ -30,7 +30,9 @@ const ShowcaseUploadPage = () => {
     }));
   };
 
-  const handleFileChange = (e) => setImages(e.target.files);
+  const handleFileChange = (e) => {
+    setImages(e.target.files);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,14 +40,26 @@ const ShowcaseUploadPage = () => {
     setSuccess(false);
 
     const data = new FormData();
-    for (const key in form) {
-      if (key === "tags") form.tags.forEach((tag) => data.append("tags", tag));
-      else data.append(key, form[key]);
+    data.append("title", form.title);
+    data.append("description", form.description);
+    data.append("location", form.location);
+    data.append("featured", form.featured);
+
+    form.tags.forEach((tag) => data.append("tags", tag));
+    for (let i = 0; i < images.length; i++) {
+      data.append("images", images[i]);
     }
-    for (let file of images) data.append("images", file);
+
+    // Optional: debug FormData
+    // for (let [key, value] of data.entries()) {
+    //   console.log(`${key}:`, value);
+    // }
 
     try {
-      await axios.post("/api/showcase", data);
+      await axios.post("/api/showcase", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       setSuccess(true);
       setForm({
         title: "",
@@ -56,7 +70,7 @@ const ShowcaseUploadPage = () => {
       });
       setImages([]);
     } catch (error) {
-      console.error("Error uploading project:", error);
+      console.error("❌ Upload failed:", error.response?.data || error.message);
       alert("An error occurred while uploading the project.");
     } finally {
       setLoading(false);
@@ -111,7 +125,9 @@ const ShowcaseUploadPage = () => {
 
             {/* Tags */}
             <div>
-              <p className="font-medium mb-2 flex items-center gap-2"><Tag size={16} /> Select Tags:</p>
+              <p className="font-medium mb-2 flex items-center gap-2">
+                <Tag size={16} /> Select Tags:
+              </p>
               <div className="flex flex-wrap gap-2">
                 {tagOptions.map((tag) => (
                   <button
@@ -148,14 +164,20 @@ const ShowcaseUploadPage = () => {
                 <ImagePlus size={18} />
                 Upload Images
               </label>
-              <input type="file" multiple onChange={handleFileChange} className="w-full" />
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full"
+              />
               {images.length > 0 && (
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                   {Array.from(images).map((file, idx) => (
                     <img
                       key={idx}
                       src={URL.createObjectURL(file)}
-                      alt="preview"
+                      alt={`preview-${idx}`}
                       className="rounded-lg object-cover h-32 w-full border"
                     />
                   ))}

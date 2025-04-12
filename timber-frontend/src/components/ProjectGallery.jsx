@@ -1,116 +1,213 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Line, Pie } from "react-chartjs-2";
-import TransactionForm from "../pages/Financials/TransactionForm";
-import "chart.js/auto";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, UploadCloud } from "lucide-react";
+import { motion } from "framer-motion";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import "../css/ProjectGallery.css"; // ✅ Import custom CSS
 
-const FinancialDashboard = () => {
+import placeholder from "../photos/placeholder.jpg";
+import photo5 from "../photos/photo5.jpg";
+import photo7 from "../photos/photo7.jpg";
+import photo8 from "../photos/photo8.jpg";
+import photo9 from "../photos/photo9.jpg";
+import photo10 from "../photos/photo10.jpg";
+import photo14 from "../photos/photo14.jpg";
+import photo18 from "../photos/photo18.jpg";
+import photo19 from "../photos/photo19.jpg";
+import photo20 from "../photos/photo20.jpg";
+import photo21 from "../photos/photo21.jpg";
+import photo34 from "../photos/photo34.jpg";
+import photo35 from "../photos/photo35.jpg";
+import photo36 from "../photos/photo36.jpg";
+import photo37 from "../photos/photo37.jpg";
+import photo38 from "../photos/photo38.jpg";
+import photo42 from "../photos/photo42.jpg";
+import photo47 from "../photos/photo47.jpg";
+import photo50 from "../photos/photo50.jpg";
+import photo56 from "../photos/photo56.jpg";
+import photo58 from "../photos/photo58.jpg";
+import photo62 from "../photos/photo62.jpg";
+import photo63 from "../photos/photo63.jpg";
+import photo65 from "../photos/photo65.jpg";
+import photo70 from "../photos/photo70.jpg";
+import photo74 from "../photos/photo74.jpg";
+
+// Default gallery images
+const initialImages = [
+  { src: photo5, caption: "Timber Foundation Setup" },
+  { src: photo7, caption: "Smart Project Planning" },
+  { src: photo8, caption: "Structural Frame Installation" },
+  { src: photo9, caption: "Site Supervision Phase" },
+  { src: photo10, caption: "Inspection of Materials" },
+  { src: photo14, caption: "Team in Action" },
+  { src: photo18, caption: "Wall Panel Assembly" },
+  { src: photo19, caption: "Design Execution" },
+  { src: photo20, caption: "Project Overview Meeting" },
+  { src: photo21, caption: "Collaborative Timber Build" },
+  { src: photo34, caption: "Roofing in Progress" },
+  { src: photo35, caption: "Scaffold Setup" },
+  { src: photo36, caption: "Eco-Friendly Insulation" },
+  { src: photo37, caption: "Site Readiness Check" },
+  { src: photo38, caption: "Client Site Walkthrough" },
+  { src: photo42, caption: "Framing Completion" },
+  { src: photo47, caption: "Precision Joinery Work" },
+  { src: photo50, caption: "Timber Beam Lifting" },
+  { src: photo56, caption: "Structural Finalization" },
+  { src: photo58, caption: "Mid-Project Review" },
+  { src: photo62, caption: "Construction Milestone" },
+  { src: photo63, caption: "Safety Inspection" },
+  { src: photo65, caption: "Progress Snapshot" },
+  { src: photo70, caption: "Final Touches" },
+  { src: photo74, caption: "Project Completion" },
+];
+
+const ProjectGallery = () => {
   const navigate = useNavigate();
-  const [summary, setSummary] = useState({
-    totalIncome: 0,
-    totalExpense: 0,
-    monthlyIncome: [],
-    monthlyExpense: [],
-  });
-  const [projects, setProjects] = useState([]);
-  const [filters, setFilters] = useState({
-    projectId: "",
-    startDate: "",
-    endDate: "",
-  });
-  const [tab, setTab] = useState("overview");
+  const [galleryImages, setGalleryImages] = useState(initialImages);
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [upload, setUpload] = useState({ file: null, preview: null, caption: "" });
 
-  useEffect(() => {
-    axios.get("/api/projects").then((res) => setProjects(res.data));
-    refreshData();
-  }, []);
-
-  const refreshData = () => {
-    axios
-      .get("/api/finance/summary", { params: filters })
-      .then((res) => setSummary(res.data));
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUpload((prev) => ({ ...prev, file, preview: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const netBalance = summary.totalIncome - summary.totalExpense;
-  const months = summary.monthlyIncome.map((i) => i.month);
-  const incomeData = summary.monthlyIncome.map((i) => i.amount);
-  const expenseData = summary.monthlyExpense.map((e) => e.amount);
+  const handleAddImage = () => {
+    if (upload.preview) {
+      setGalleryImages((prev) => [
+        { src: upload.preview, caption: upload.caption || "New Upload" },
+        ...prev,
+      ]);
+      setUpload({ file: null, preview: null, caption: "" });
+    }
+  };
+
+  const handleOpenLightbox = (index) => {
+    if (galleryImages[index]) {
+      setPhotoIndex(index);
+      setIsOpen(true);
+    }
+  };
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", lineHeight: 1.5 }}>
+    <div className="font-sans min-h-screen bg-gray-50">
       {/* Header */}
-      <header style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "1.5rem 2rem",
-        backgroundColor: "#1f2937",
-        color: "#fff"
-      }}>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Financial Dashboard</h1>
+      <header className="flex items-center justify-between px-8 py-4 bg-gray-800 text-white">
+        <h1 className="text-xl font-bold">Project Gallery</h1>
         <button
           onClick={() => navigate("/dashboard")}
-          style={{ padding: "0.5rem 1rem", backgroundColor: "#3b82f6", color: "#fff", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
         >
-          <LayoutDashboard /> Home
+          <LayoutDashboard className="w-5 h-5" /> Home
         </button>
       </header>
 
-      {/* Main Content */}
-      <main style={{ padding: "2rem" }}>
-        {/* Filters */}
-        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-          <select value={filters.projectId} onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}>
-            <option value="">All Projects</option>
-            {projects.map((p) => (
-              <option key={p._id} value={p._id}>{p.name}</option>
-            ))}
-          </select>
-          <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
-          <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
-          <button onClick={refreshData} style={{ backgroundColor: "#3b82f6", color: "#fff", padding: "0.5rem 1rem", borderRadius: "6px" }}>Apply Filters</button>
-        </div>
-
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-          {["overview", "transactions"].map((t) => (
+      <main className="p-6 space-y-6">
+        {/* Upload Section */}
+        <section className="bg-white p-4 rounded-xl shadow-sm">
+          <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+            <UploadCloud className="w-5 h-5 text-blue-500" /> Upload New Project Image
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="file-input file-input-bordered file-input-sm"
+            />
+            <input
+              type="text"
+              placeholder="Caption (optional)"
+              value={upload.caption}
+              onChange={(e) => setUpload((prev) => ({ ...prev, caption: e.target.value }))}
+              className="input input-bordered input-sm w-full max-w-xs"
+            />
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              style={{ padding: "0.5rem 1rem", backgroundColor: tab === t ? "#3b82f6" : "#e5e7eb", color: tab === t ? "#fff" : "#111827", borderRadius: "6px" }}
+              onClick={handleAddImage}
+              disabled={!upload.preview}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              Add to Gallery
             </button>
-          ))}
-        </div>
-
-        {tab === "overview" && (
-          <>
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-              <div style={{ padding: "1rem", backgroundColor: "#e6f7e6", borderRadius: "6px" }}>
-                <strong>Total Income:</strong> ${summary.totalIncome.toFixed(2)}
-              </div>
-              <div style={{ padding: "1rem", backgroundColor: "#ffe6e6", borderRadius: "6px" }}>
-                <strong>Total Expenses:</strong> ${summary.totalExpense.toFixed(2)}
-              </div>
-              <div style={{ padding: "1rem", backgroundColor: "#e6f4ff", borderRadius: "6px" }}>
-                <strong>Net Balance:</strong> ${netBalance.toFixed(2)}
-              </div>
+          </div>
+          {upload.preview && (
+            <div className="mt-4">
+              <img
+                src={upload.preview}
+                alt="Preview"
+                className="w-40 aspect-square object-cover border rounded shadow"
+              />
             </div>
+          )}
+        </section>
 
-            <Line data={{ labels: months, datasets: [{ label: "Income", data: incomeData, borderColor: "#4caf50" }, { label: "Expenses", data: expenseData, borderColor: "#f44336" }] }} />
-            <Pie data={{ labels: ["Income", "Expenses"], datasets: [{ data: [summary.totalIncome, summary.totalExpense], backgroundColor: ["#4caf50", "#f44336"] }] }} />
-          </>
-        )}
+        {/* Gallery Display */}
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Featured Projects</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+            {galleryImages.map((img, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: index * 0.02 }}
+                className="gallery-card"
+                onClick={() => handleOpenLightbox(index)}
+              >
+                <img
+                  src={img.src || placeholder}
+                  alt={img.caption || `Project ${index + 1}`}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = placeholder;
+                  }}
+                  className="gallery-image"
+                />
+                <div className="gallery-caption">
+                  <h3 className="font-semibold text-gray-800 text-md mb-1">
+                    Project {index + 1}
+                  </h3>
+                  <p className="text-sm text-gray-600 italic">
+                    {img.caption || "No description available."}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
-        {tab === "transactions" && (
-          <TransactionForm onNewTransaction={refreshData} />
+        {/* Lightbox Viewer */}
+        {isOpen && (
+          <Lightbox
+            open={isOpen}
+            close={() => setIsOpen(false)}
+            index={photoIndex}
+            slides={galleryImages.map((img) => ({
+              src: img.src || placeholder,
+              alt: img.caption,
+              description: img.caption,
+            }))}
+            render={{
+              description: ({ slide }) => (
+                <div className="text-white text-center text-sm mt-2 italic">
+                  {slide.description}
+                </div>
+              ),
+            }}
+          />
         )}
       </main>
     </div>
   );
 };
 
-export default FinancialDashboard;
+export default ProjectGallery;

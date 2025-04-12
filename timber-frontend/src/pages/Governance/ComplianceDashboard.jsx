@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { getAuthHeader } from "../../utils/authHeader";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
@@ -46,27 +47,30 @@ const ComplianceDashboard = ({ projectId: propProjectId }) => {
   const [currentHero, setCurrentHero] = useState(0);
   const heroImages = [photoHero1, photoHero2];
 
+  // ✅ Fetch compliance documents with auth token
+  const fetchDocs = async () => {
+    try {
+      const config = await getAuthHeader();
+      const res = await axios.get("/api/compliance", config);
+      setDocuments(res.data.documents || []);
+    } catch (err) {
+      console.error("Error fetching compliance documents:", err);
+    }
+  };
+
+  const fetchSustainabilityScore = async () => {
+    if (!projectId) return;
+    try {
+      const config = await getAuthHeader();
+      const res = await axios.get(`/api/sustainability/score/${projectId}`, config);
+      setScore(res.data);
+    } catch (err) {
+      console.error("Error fetching sustainability score:", err);
+      setScore(null);
+    }
+  };
+
   useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const res = await axios.get("/api/compliance");
-        setDocuments(res.data.documents || []);
-      } catch (err) {
-        console.error("Error fetching compliance documents:", err);
-      }
-    };
-
-    const fetchSustainabilityScore = async () => {
-      if (!projectId) return;
-      try {
-        const res = await axios.get(`/api/sustainability/score/${projectId}`);
-        setScore(res.data);
-      } catch (err) {
-        console.error("Error fetching sustainability score:", err);
-        setScore(null);
-      }
-    };
-
     fetchDocs();
     fetchSustainabilityScore();
   }, [projectId]);
@@ -103,7 +107,7 @@ const ComplianceDashboard = ({ projectId: propProjectId }) => {
         </div>
       </header>
 
-      {/* Hero Banner */}
+      {/* Hero Section */}
       <section
         style={{
           padding: "5rem 2rem",
@@ -112,33 +116,14 @@ const ComplianceDashboard = ({ projectId: propProjectId }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           color: "#fff",
-          transition: "background-image 1s ease-in-out",
           position: "relative",
-          animation: "fadeIn 1.5s ease-in",
+          transition: "background-image 1s ease-in-out",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            animation: "slideUp 1s ease-out",
-          }}
-        >
-          <h2 style={{ fontSize: "2.25rem", fontWeight: 600 }}>
-            Compliance & Sustainability Management
-          </h2>
-          <p style={{ fontSize: "1.1rem", maxWidth: "650px", margin: "1rem auto" }}>
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <div className="relative z-20">
+          <h2 className="text-3xl font-bold">Compliance & Sustainability Management</h2>
+          <p className="mt-2 text-lg max-w-xl mx-auto">
             Upload permits, monitor green ratings, and track governance in real-time.
           </p>
         </div>
@@ -200,8 +185,11 @@ const ComplianceDashboard = ({ projectId: propProjectId }) => {
                           </div>
                           <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
                             <div
-                              className={`${progress === 100 ? "bg-green-500" : progress === 60 ? "bg-yellow-400" : "bg-red-400"}`}
-                              style={{ width: `${progress}%`, height: "100%", transition: "width 0.3s ease" }}
+                              className={`transition-all duration-300 ${
+                                progress === 100 ? "bg-green-500" :
+                                progress === 60 ? "bg-yellow-400" : "bg-red-400"
+                              }`}
+                              style={{ width: `${progress}%`, height: "100%" }}
                             ></div>
                           </div>
                         </div>
