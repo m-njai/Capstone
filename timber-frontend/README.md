@@ -2,11 +2,11 @@
 
 An AI-powered web platform that streamlines timber cost estimation, inventory management, supplier integration, and project tracking for the construction industry.
 
-🚀 Overview
+ Overview
 
 The construction sector faces inefficiencies in timber procurement, cost planning, inventory tracking, and compliance. Smart Timber Construction offers a modern, digital solution to automate these workflows using AI, real-time APIs, and modern UI components.
 
-🎯 Key Features
+Key Features
 
 - 🔢 Timber Cost Estimation:** Calculate costs based on material type, dimensions, and supplier rates.
 - 📦 Inventory Management:** Monitor stock levels and receive low-stock alerts.
@@ -22,12 +22,12 @@ The construction sector faces inefficiencies in timber procurement, cost plannin
 
 🧱 Architecture
 
-- Frontend:** React.js + Tailwind CSS + Framer Motion
-- **Backend:** Node.js + Express.js
-- Database:** MongoDB (with Mongoose) + Firebase Auth
-- Hosting:** Vercel (frontend) + Render/Railway (backend)
-- Cloud Services:** Firebase Storage, Mailchimp, mangoose DB,
-- Dev Tools:** Postman, Swagger UI, Trello, Figma
+- Frontend: React.js + Tailwind CSS + Framer Motion
+- Backend: Node.js + Express.js
+- Database:MongoDB (with Mongoose) + Firebase Auth
+- Hosting: Vercel (frontend) + Render/Railway (backend)
+- Cloud Services: Firebase Storage, Mailchimp, mangoose DB,
+- Dev Tools: Postman, Swagger UI, Trello, Figma
 
 📦 Project Structure
 
@@ -76,6 +76,6 @@ Blockchain-based smart contracts
 
 Advanced AI prediction for cost inflation
 
-👩‍💼 Author
+Author
 Margret Mariama Njai
 Capstone Project – Software Engineering (April 2025)
